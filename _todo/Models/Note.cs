@@ -6,7 +6,7 @@ namespace _todo.Models
     public class Note
     {
         public int Id { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime DeadlineTime { get; set; }
         public string Title { get; set; }
         public string Body { get; set; }

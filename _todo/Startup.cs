@@ -62,7 +62,7 @@ namespace _todo
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Notes}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

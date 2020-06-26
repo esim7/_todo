@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using _todo.Data;
 using _todo.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace _todo.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,57 +23,33 @@ namespace _todo.Controllers
             _context = context;
         }
 
-        // GET: Notes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Notes.Include(n => n.IdentityUser);
-            return View(await applicationDbContext.ToListAsync());
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+            var notes = _context.Notes.Where(n=>n.IdentityUser == currentUser);
+            return View(notes);
         }
 
-        // GET: Notes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var note = await _context.Notes
-                .Include(n => n.IdentityUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (note == null)
-            {
-                return NotFound();
-            }
-
-            return View(note);
-        }
-
-        // GET: Notes/Create
         public IActionResult Create()
         {
-            ViewData["IdentityUserId"] = new SelectList(_context.Set<IdentityUser>(), "Id", "Id");
             return View();
         }
 
-        // POST: Notes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CreationDate,DeadlineTime,Title,Body,IsCompleted,IdentityUserId")] Note note)
+        public async Task<IActionResult> Create(Note note)
         {
             if (ModelState.IsValid)
             {
+                var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+                note.IdentityUser = currentUser;
                 _context.Add(note);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Set<IdentityUser>(), "Id", "Id", note.IdentityUserId);
             return View(note);
         }
 
-        // GET: Notes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -82,16 +62,12 @@ namespace _todo.Controllers
             {
                 return NotFound();
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Set<IdentityUser>(), "Id", "Id", note.IdentityUserId);
             return View(note);
         }
 
-        // POST: Notes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CreationDate,DeadlineTime,Title,Body,IsCompleted,IdentityUserId")] Note note)
+        public async Task<IActionResult> Edit(int id,  Note note)
         {
             if (id != note.Id)
             {
@@ -102,6 +78,8 @@ namespace _todo.Controllers
             {
                 try
                 {
+                    var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
+                    note.IdentityUser = currentUser;
                     _context.Update(note);
                     await _context.SaveChangesAsync();
                 }
@@ -118,11 +96,9 @@ namespace _todo.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Set<IdentityUser>(), "Id", "Id", note.IdentityUserId);
             return View(note);
         }
 
-        // GET: Notes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +117,6 @@ namespace _todo.Controllers
             return View(note);
         }
 
-        // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
