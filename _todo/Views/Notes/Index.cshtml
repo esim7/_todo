@@ -5,64 +5,27 @@
 }
 
 <h1>Список заметок</h1>
+@using (Html.BeginForm("Index", "Notes", FormMethod.Get))
+{
+    <input class="form-control mb-2" placeholder="Search" name="value" />
+    <input type="submit" value="Go" class="btn btn-outline-info mb-5" />
+}
 
 <p>
     <a asp-action="Create">Добавить заметку</a>
 </p>
-@*<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CreationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeadlineTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Body)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DeadlineTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>*@
-
 
 <ul class="list-unstyled todo-items">
     @foreach (var el in Model)
     {
         <li class="mb-4" data-toggle="tooltip" data-placement="top" title="Выполнить до: @el.DeadlineTime">
-            <div class=" todo-card card w-75 text-white bg-dark">
+            <div class="todo-card card w-75 text-white @el.IsCompleted ? bg-dark : bg-success">
                 <div class="card-body">
                     <h5 class="card-title">@el.Title</h5>
                     <p class="card-text">@el.Body</p>
                     <p class="card-text">@el.Body</p>
                     <button class="complete-btn btn btn-success float-right">Finish</button>
-                    <a asp-action="Edit" asp-route-id="@el.Id" class="float-right btn btn-primary mr-2">Redact</a> 
+                    <a asp-action="Edit" asp-route-id="@el.Id" class="float-right btn btn-primary mr-2">Redact</a>
                     @*<a asp-action="Delete" asp-route-id="@el.Id">Удалить</a>*@
                 </div>
             </div>

@@ -23,11 +23,10 @@ namespace _todo.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string value)
         {
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == HttpContext.User.Identity.Name);
-            var notes = _context.Notes.Where(n=>n.IdentityUser == currentUser);
-            return View(notes);
+            return View(await _context.Notes.Where(n => n.Title.Contains(value) || value ==null).Where(n => n.IdentityUser == currentUser).ToListAsync());
         }
 
         public IActionResult Create()
