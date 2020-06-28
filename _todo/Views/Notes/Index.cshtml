@@ -19,14 +19,22 @@
     @foreach (var el in Model)
     {
         <li class="mb-4" data-toggle="tooltip" data-placement="top" title="Выполнить до: @el.DeadlineTime">
-            <div class="todo-card card w-75 text-white @el.IsCompleted ? bg-dark : bg-success">
+            <div class="todo-card card w-75 text-white bg-dark" id="@el.Id">
                 <div class="card-body">
                     <h5 class="card-title">@el.Title</h5>
                     <p class="card-text">@el.Body</p>
-                    <p class="card-text">@el.Body</p>
-                    <button class="complete-btn btn btn-success float-right">Finish</button>
+                    <p class="card-text">Дата создания: @el.CreationDate</p>
+                    <button class="complete-btn btn btn-warning float-right">Finish</button>
                     <a asp-action="Edit" asp-route-id="@el.Id" class="float-right btn btn-primary mr-2">Redact</a>
                     @*<a asp-action="Delete" asp-route-id="@el.Id">Удалить</a>*@
+                    @if (el.IsCompleted)
+                    {
+                        <script>
+                            var card = document.getElementById("@el.Id");
+                            card.classList.remove("bg-dark");
+                            card.classList.add("bg-success");
+                        </script>
+                    }
                 </div>
             </div>
         </li>
