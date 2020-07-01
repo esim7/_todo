@@ -126,6 +126,15 @@ namespace _todo.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> FinishNote(int id)
+        {
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id);
+            note.IsCompleted = true;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         private bool NoteExists(int id)
         {
             return _context.Notes.Any(e => e.Id == id);
